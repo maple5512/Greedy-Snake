@@ -1,0 +1,3 @@
+﻿  tcs.cpp
+C:\Users\65404\source\repos\Project2\Project2\tcs.cpp(144,14): warning C4101: “q”: 未引用的局部变量
+  Project2.vcxproj -> C:\Users\65404\source\repos\Project2\x64\Debug\Project2.exe
