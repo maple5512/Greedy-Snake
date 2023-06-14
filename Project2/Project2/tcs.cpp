@@ -4,7 +4,7 @@
 #include<conio.h>
 #include<time.h>
 #include<stdlib.h>
-typedef struct SNAKE
+typedef struct SNAKE//定义蛇
 {
 	int xx;
 	int yy;
@@ -17,7 +17,7 @@ char key = 'd';
 char key_temp='\0';
 int food_x, food_y;
 int sleep_time = 250;
-void create_snake_list()
+void create_snake_list()//创建蛇
 {
 	head = (link)malloc(sizeof(snake));
 	end = (link)malloc(sizeof(snake));
@@ -26,7 +26,7 @@ void create_snake_list()
 	end->last = head;
 	end->next = NULL;
 }
-void create_snake_head(link head, link end)
+void create_snake_head(link head, link end)//创建蛇头
 {
 	link body1;
 	body1 = (link)malloc(sizeof(snake));
@@ -37,7 +37,7 @@ void create_snake_head(link head, link end)
 	body1->xx = 15;
 	body1->yy = 15;
 }
-void draw_snake_list(link head, link end)
+void draw_snake_list(link head, link end)//绘制蛇
 {
 	link p;
 	p = head->next;
@@ -48,7 +48,7 @@ void draw_snake_list(link head, link end)
 			p = p->next;
 		}
 }
-void hide_snake_list(link head, link end)
+void hide_snake_list(link head, link end)//把蛇已经离开的部分藏起来
 {
 	link p;
 	p = head->next;
@@ -59,7 +59,7 @@ void hide_snake_list(link head, link end)
 		p = p->next;
 	}
 }
-void snake_move(link head, link end)
+void snake_move(link head, link end)//蛇移动
 {
 	link p,q;
 	p = head->next;
@@ -81,7 +81,7 @@ void snake_move(link head, link end)
 	p = p->next;
 
 }
-void check_key(char key_t)
+void check_key(char key_t)//输入检测，蛇移动不可180度变换方向
 {
 	if (key_t == '\0')
 		return;
@@ -95,7 +95,7 @@ void check_key(char key_t)
 		key = key_t;
 }
 
-int check_SnakeAndWall(link head,link end)
+int check_SnakeAndWall(link head,link end)//撞墙检测
 {
 	link p;
 	p = head->next;
@@ -103,7 +103,7 @@ int check_SnakeAndWall(link head,link end)
 		return 0;
 	return 1;
 }
-int check_SnakeAndFood(link head, link end)
+int check_SnakeAndFood(link head, link end)//检测，创建的食物不可与蛇重合
 {
 	link p;
 	p = head->next;
@@ -115,7 +115,7 @@ int check_SnakeAndFood(link head, link end)
 	}
 	return 0;
 }
-void create_food(link head, link end)
+void create_food(link head, link end)//随机创建食物
 {
 	do{
 		srand((unsigned)time(NULL));
@@ -124,13 +124,13 @@ void create_food(link head, link end)
 	} while (check_SnakeAndFood(head, end) == 1);
 
 }
-void draw_food()
+void draw_food()//绘制食物
 {
 	setfillcolor(RGB(238, 238, 0));
 	fillcircle((food_x * 20) - 10, (food_y * 20) - 10, 10);
 }
 
-int check_SnakeEatFood(link head, link end)
+int check_SnakeEatFood(link head, link end)//蛇吃食物检测
 {
 	link p;
 	p = head->next;
@@ -139,7 +139,7 @@ int check_SnakeEatFood(link head, link end)
 	return 0;
 }
 
-void SnakeBodyAdd(link head, link end)
+void SnakeBodyAdd(link head, link end)//蛇身增长
 {
 	link body,p,q;
 	body = (link)malloc(sizeof(snake));
@@ -152,7 +152,7 @@ void SnakeBodyAdd(link head, link end)
 	body->next = end;
 	create_food(head, end);
 }
-int check_SnakeAndBody(link head, link end)
+int check_SnakeAndBody(link head, link end)//判定蛇是否吃到自己
 {
 	link p,q;
 	p = head->next;
@@ -170,7 +170,7 @@ int main()
 	initgraph(600, 600);
 	setbkcolor(RGB(132, 112, 255));
 	setlinecolor(RGB(132, 112, 255));
-	settextstyle(42, 20, _T("����"));
+	settextstyle(42, 20, _T("宋体"));
 	cleardevice();
 	create_snake_list();
 	create_snake_head(head,end);
@@ -186,13 +186,13 @@ int main()
 		snake_move(head, end);
 		if (check_SnakeAndWall(head, end) == 0)
 		{
-			outtextxy(220, 280, _T("��Ϸ������"));
+			outtextxy(220, 280, _T("游戏结束！"));
 			system("pause");
 			return 0;
 		}
 		if (check_SnakeAndBody(head, end) == 1)
 		{
-			outtextxy(220, 280, _T("��Ϸ������"));
+			outtextxy(220, 280, _T("游戏结束！"));
 			system("pause");
 			return 0;
 		}
