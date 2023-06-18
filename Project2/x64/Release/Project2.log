@@ -1,0 +1,7 @@
+﻿  tcs.cpp
+D:\QQ\2351318778\FileRecv\Project2\Project2\Project2\tcs.cpp(194,16): warning C4101: “q”: 未引用的局部变量
+  正在生成代码
+  Previous IPDB not found, fall back to full compilation.
+  All 20 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  已完成代码的生成
+  Project2.vcxproj -> D:\QQ\2351318778\FileRecv\Project2\Project2\x64\Release\Project2.exe
