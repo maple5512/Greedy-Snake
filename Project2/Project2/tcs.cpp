@@ -4,10 +4,13 @@
 #include<conio.h>
 #include<time.h>
 #include<stdlib.h>
-typedef struct SNAKE//å®šä¹‰è›‡
+#include<stdio.h>
+typedef struct SNAKE//¶¨ÒåÉß
 {
 	int xx;
 	int yy;
+	int xx1;
+	int yy1;
 	struct SNAKE* last;
 	struct SNAKE* next;
 }snake, *link;
@@ -15,9 +18,14 @@ typedef struct SNAKE//å®šä¹‰è›‡
 link head, end;
 char key = 'd';
 char key_temp='\0';
-int food_x, food_y;
+int food1_x, food1_y;
+int food2_x, food2_y;
 int sleep_time = 250;
-void create_snake_list()//åˆ›å»ºè›‡
+int scolor;
+int score = 0; //³õÊ¼»¯µÃ·Ö
+int state = 0;
+
+void create_snake_list()//´´½¨Éß
 {
 	head = (link)malloc(sizeof(snake));
 	end = (link)malloc(sizeof(snake));
@@ -26,7 +34,7 @@ void create_snake_list()//åˆ›å»ºè›‡
 	end->last = head;
 	end->next = NULL;
 }
-void create_snake_head(link head, link end)//åˆ›å»ºè›‡å¤´
+void create_snake_head(link head, link end)//´´½¨ÉßÍ·
 {
 	link body1;
 	body1 = (link)malloc(sizeof(snake));
@@ -37,18 +45,49 @@ void create_snake_head(link head, link end)//åˆ›å»ºè›‡å¤´
 	body1->xx = 15;
 	body1->yy = 15;
 }
-void draw_snake_list(link head, link end)//ç»˜åˆ¶è›‡
+//»æÖÆÉßµÄÉíÌåµÄÑÕÉ«
+int draw_snake_color()
+{
+	int scolor;//ÉèÖÃº¯Êý·µ»Ø½ÓÊÜ±äÁ¿
+
+	wchar_t s[10];// ¶¨Òå×Ö·û´®»º³åÇø£¬²¢½ÓÊÕÓÃ»§ÊäÈë
+
+	outtextxy(20, 20, _T("Ñ¡ÔñÉßÉíµÄÑÕÉ«£¡"));
+	outtextxy(20, 80, _T("°´1,Êä³öºìÉ«£¡"));
+	outtextxy(310, 80, _T("°´2,Êä³öÂÌÉ«£¡"));
+	outtextxy(20, 140, _T("°´3,Êä³ö×ÏÉ«£¡"));
+	outtextxy(310, 140, _T("°´4,Êä³öÉîÂÌ£¡"));
+
+	InputBox((LPTSTR)s, 10, _T("Ñ¡Ôñ°´¼ü£¡"));//µ¯¿òÊäÈë
+
+	int r = _wtoi(s);//×ª»»ÎªÊý×Ö
+
+	switch (r)//Ñ¡Ôñ¹¦ÄÜ
+	{
+	case 1: scolor = RGB(204, 23, 23);                      break;
+	case 2: scolor = RGB(0, 255, 44);                        break;
+	case 3: scolor = RGB(206, 5, 203);                        break;
+	case 4: scolor = RGB(49, 101, 95);                       break;
+	default: scolor = RGB(41, 52, 52);                   break;
+	}
+	return scolor;
+}
+
+void draw_snake_list(link head, link end, int scolor)//»æÖÆÉß
 {
 	link p;
 	p = head->next;
-	setfillcolor(RGB(205, 38, 38));
+	//»æÖÆÉßµÄÉíÌåµÄÑÕÉ«
+	setfillcolor(scolor);
+
 	while (p != end)
-		{
-			fillcircle((p->xx * 20) - 10, (p->yy * 20) - 10, 10);//fillcircle(x,y,z)
-			p = p->next;
-		}
+	{
+		fillcircle((p->xx * 20) - 10, (p->yy * 20) - 10, 10);//fillcircle(x,y,z)
+		p = p->next;
+	}
 }
-void hide_snake_list(link head, link end)//æŠŠè›‡å·²ç»ç¦»å¼€çš„éƒ¨åˆ†è—èµ·æ¥
+
+void hide_snake_list(link head, link end)//°ÑÉßÒÑ¾­Àë¿ªµÄ²¿·Ö²ØÆðÀ´
 {
 	link p;
 	p = head->next;
@@ -59,7 +98,7 @@ void hide_snake_list(link head, link end)//æŠŠè›‡å·²ç»ç¦»å¼€çš„éƒ¨åˆ†è—èµ·æ¥
 		p = p->next;
 	}
 }
-void snake_move(link head, link end)//è›‡ç§»åŠ¨
+void snake_move(link head, link end)//ÉßÒÆ¶¯
 {
 	link p,q;
 	p = head->next;
@@ -81,7 +120,7 @@ void snake_move(link head, link end)//è›‡ç§»åŠ¨
 	p = p->next;
 
 }
-void check_key(char key_t)//è¾“å…¥æ£€æµ‹ï¼Œè›‡ç§»åŠ¨ä¸å¯180åº¦å˜æ¢æ–¹å‘
+void check_key(char key_t)//ÊäÈë¼ì²â£¬ÉßÒÆ¶¯²»¿É180¶È±ä»»·½Ïò
 {
 	if (key_t == '\0')
 		return;
@@ -95,7 +134,7 @@ void check_key(char key_t)//è¾“å…¥æ£€æµ‹ï¼Œè›‡ç§»åŠ¨ä¸å¯180åº¦å˜æ¢æ–¹å‘
 		key = key_t;
 }
 
-int check_SnakeAndWall(link head,link end)//æ’žå¢™æ£€æµ‹
+int check_SnakeAndWall(link head,link end)//×²Ç½¼ì²â
 {
 	link p;
 	p = head->next;
@@ -103,56 +142,72 @@ int check_SnakeAndWall(link head,link end)//æ’žå¢™æ£€æµ‹
 		return 0;
 	return 1;
 }
-int check_SnakeAndFood(link head, link end)//æ£€æµ‹ï¼Œåˆ›å»ºçš„é£Ÿç‰©ä¸å¯ä¸Žè›‡é‡åˆ
+int check_SnakeAndFood(link head, link end)//¼ì²â£¬´´½¨µÄÊ³Îï²»¿ÉÓëÉßÖØºÏ
 {
 	link p;
 	p = head->next;
 	while (p != end)
 	{
-		if (food_x == p->xx && food_y == p->yy)
+		if (food1_x == p->xx && food1_y == p->yy)
+			return 1;
+		if (food2_x == p->xx && food2_y == p->yy)
 			return 1;
 		p = p->next;
 	}
 	return 0;
 }
-void create_food(link head, link end)//éšæœºåˆ›å»ºé£Ÿç‰©
+void create_food(link head, link end)//Ëæ»ú´´½¨Ê³Îï
 {
 	do{
 		srand((unsigned)time(NULL));
-		food_x = rand() % 30 + 1;
-		food_y = rand() % 30 + 1;
+		food1_x = rand() % 30 + 1;
+		food1_y = rand() % 30 + 1;
+		food2_x = rand() % 20 + 1;
+		food2_y = rand() % 20 + 1;
 	} while (check_SnakeAndFood(head, end) == 1);
 
 }
-void draw_food()//ç»˜åˆ¶é£Ÿç‰©
+void draw_food()//»æÖÆÊ³Îï
 {
 	setfillcolor(RGB(238, 238, 0));
-	fillcircle((food_x * 20) - 10, (food_y * 20) - 10, 10);
+	fillcircle((food1_x * 20) - 10, (food1_y * 20) - 10, 10);
+	setfillcolor(RGB(150, 150, 200));
+	fillcircle((food2_x * 20) - 10, (food2_y * 20) - 10, 10);
 }
 
-int check_SnakeEatFood(link head, link end)//è›‡åƒé£Ÿç‰©æ£€æµ‹
+int check_SnakeEatFood(link head, link end)//Éß³ÔÊ³Îï¼ì²â
 {
 	link p;
 	p = head->next;
-	if (p->xx == food_x && p->yy == food_y)
+	if (p->xx == food1_x && p->yy == food1_y)
+		return 1;
+	if (p->xx == food2_x && p->yy == food2_y)
 		return 1;
 	return 0;
 }
 
-void SnakeBodyAdd(link head, link end)//è›‡èº«å¢žé•¿
+void SnakeBodyAdd(link head, link end)//ÉßÉíÔö³¤
 {
 	link body,p,q;
 	body = (link)malloc(sizeof(snake));
 	p = end->last;
-	body->xx = food_x;
-	body->yy = food_y;
+	if (food1_x && food1_y)
+	{
+		body->xx = food1_x;
+		body->yy = food1_y;
+	}
+	else if (food2_x && food2_y)
+	{
+		body->xx = food2_x;
+		body->yy = food2_y;
+	}
 	p->next = body;
 	end->last = body;
 	body->last = p;
 	body->next = end;
 	create_food(head, end);
 }
-int check_SnakeAndBody(link head, link end)//åˆ¤å®šè›‡æ˜¯å¦åƒåˆ°è‡ªå·±
+int check_SnakeAndBody(link head, link end)//ÅÐ¶¨ÉßÊÇ·ñ³Ôµ½×Ô¼º
 {
 	link p,q;
 	p = head->next;
@@ -165,17 +220,21 @@ int check_SnakeAndBody(link head, link end)//åˆ¤å®šè›‡æ˜¯å¦åƒåˆ°è‡ªå·±
 	}
 	return 0;
 }
-int main()
+int game()
 {
 	initgraph(600, 600);
 	setbkcolor(RGB(132, 112, 255));
 	setlinecolor(RGB(132, 112, 255));
-	settextstyle(42, 20, _T("å®‹ä½“"));
-	cleardevice();
+	settextstyle(42, 20, _T("ËÎÌå"));
+	scolor = draw_snake_color();
+	cleardevice();      //ÔÚÏÔÊ¾Êä³öºó£¬Çå³ýÏÔÊ¾ÄÚÈÝ
 	create_snake_list();
 	create_snake_head(head,end);
-	draw_snake_list(head, end);
+	draw_snake_list(head, end, scolor);
 	create_food(head, end);
+	TCHAR str_score[20]; // ¶¨ÒåµÃ·Ö×Ö·û´®
+	sprintf_s(str_score, _T("µÃ·Ö£º%d"), score); // ³õÊ¼»¯µÃ·Ö
+	outtextxy(10, 10, str_score); // Êä³öµÃ·Ö
 	while (1) {
 		draw_food();
 		Sleep(sleep_time);
@@ -186,13 +245,13 @@ int main()
 		snake_move(head, end);
 		if (check_SnakeAndWall(head, end) == 0)
 		{
-			outtextxy(220, 280, _T("æ¸¸æˆç»“æŸï¼"));
+			outtextxy(140, 280, _T("Éß×²Ç½£¬ÓÎÏ·½áÊø£¡"));
 			system("pause");
 			return 0;
 		}
 		if (check_SnakeAndBody(head, end) == 1)
 		{
-			outtextxy(220, 280, _T("æ¸¸æˆç»“æŸï¼"));
+			outtextxy(100, 280, _T("Éß³Ôµ½×Ô¼º£¬ÓÎÏ·½áÊø£¡"));
 			system("pause");
 			return 0;
 		}
@@ -200,8 +259,84 @@ int main()
 		{
 			SnakeBodyAdd(head, end);
 			create_food(head, end);
+			score += 10; // Ôö¼ÓµÃ·Ö
+
+			sprintf_s(str_score, _T("µÃ·Ö£º%d"), score); // ¸üÐÂµÃ·Ö×Ö·û´®
+			settextcolor(RGB(255, 255, 255));
+			outtextxy(10, 10, str_score); // ÖØÐÂÊä³öµÃ·Ö
 		}
-		draw_snake_list(head, end);
+		draw_snake_list(head, end, scolor);
 	}
 	return 0;
+}
+int main()
+{
+	initgraph(200, 300);
+	setbkcolor((RGB(28, 28, 28)));
+	cleardevice();
+	setlinecolor(WHITE);
+	settextcolor(WHITE);
+	settextstyle(42, 20, _T("Á¥Êé"));
+	outtextxy(40, 40, _T("Ì°³ÔÉß"));
+	outtextxy(60, 100, _T("¼òµ¥"));
+	outtextxy(60, 160, _T("Ò»°ã"));
+	outtextxy(60, 220, _T("À§ÄÑ"));
+	rectangle(55, 95, 145, 145);
+	rectangle(55, 155, 145, 205);
+	rectangle(55, 215, 145, 265);
+	MOUSEMSG m;
+	while (state == 0)
+	{
+		m = GetMouseMsg();
+		if (m.x > 55 && m.y > 95 && m.x < 145 && m.y < 145)
+		{
+			settextcolor(RED);
+			outtextxy(60, 100, _T("¼òµ¥"));
+			if (m.uMsg == WM_LBUTTONDOWN)
+			{
+				sleep_time = 250;
+				state = 2;
+				closegraph();
+				game();
+			}
+		}
+		else if (m.x > 55 && m.y > 155 && m.x < 145 && m.y < 205)
+		{
+			settextcolor(RED);
+			outtextxy(60, 160, _T("Ò»°ã"));
+			if (m.uMsg == WM_LBUTTONDOWN)
+			{
+				sleep_time = 150;
+				state = 2;
+				closegraph();
+				game();
+			}
+		}
+		else if (m.x > 55 && m.y > 215 && m.x < 145 && m.y < 265)
+		{
+			settextcolor(RED);
+			outtextxy(60, 220, _T("À§ÄÑ"));
+			if (m.uMsg == WM_LBUTTONDOWN)
+			{
+				sleep_time = 50;
+				state = 2;
+				closegraph();
+				game();
+			}
+		}
+		else
+		{
+			setlinecolor(WHITE);
+			settextcolor(WHITE);
+			settextstyle(42, 20, _T("Á¥Êé"));
+			outtextxy(40, 40, _T("Ì°³ÔÉß"));
+			outtextxy(60, 100, _T("¼òµ¥"));
+			outtextxy(60, 160, _T("Ò»°ã"));
+			outtextxy(60, 220, _T("À§ÄÑ"));
+			rectangle(55, 95, 145, 145);
+			rectangle(55, 155, 145, 205);
+			rectangle(55, 215, 145, 265);
+		}
+	}
+
 }
